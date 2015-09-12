@@ -1152,7 +1152,55 @@ namespace ProjectEuler
         product *= num;
       return product;
     }
-    
+
+    /// <summary>
+    /// Get all the Pythagorean triples below the input value
+    /// </summary>
+    public static List<Tuple<int, int, int>> GetPythagoreanTriples(int maxValue)
+    {
+      int a, b, c;
+      int sum = 0;
+      int multiply = 1;
+      int maxM = Convert.ToInt32(Math.Sqrt(maxValue/2)); // max. possible value of M = Sqrt(maxValue/2). See #9 for explanation
+      List<Tuple<int, int, int>> PythTriples = new List<Tuple<int, int, int>>();
+
+      for (int m = 2; m <= maxM; m++)
+      {
+        for (int n = 1; n <= (m - 1); n++)
+        {
+          // According to https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple
+          // m, n possess the following properties:
+          // 1. m and n are coprime 
+          // 2. m − n is odd
+          if (((m - n) % 2 == 0) || !CalculatorUtil.IsCoPrime(new List<int> { m, n }))
+            continue;
+
+          //find a,b,c and multiple them by natural numbers until sum > 1000
+          while (true)
+          {
+            // First we get the primitive triples, then multiply them to get the non-prim triples
+            a = (m * m - n * n) * multiply;
+            b = (2 * m * n) * multiply;
+            c = (m * m + n * n) * multiply;
+            sum = a + b + c;
+
+            if (sum > maxValue)
+              break;
+
+            Debug.WriteLine(string.Format("Pyth triples: a: {0}, b: {1}, c: {2}. Sum: {3}", a, b, c, sum));
+            PythTriples.Add(new Tuple<int, int, int>(a, b, c));
+
+            ++multiply;
+          }
+
+          // Reset multiply and sum for the next n/m value
+          multiply = 1;
+          sum = 0;
+        }
+      }
+      return PythTriples;
+    }
+
     /// <summary>
     /// Covert a 0-9 digit to char
     /// If input is not within 0 to 9, return null
@@ -1180,6 +1228,27 @@ namespace ProjectEuler
         return true;
       else
         return false;
+    }
+
+    /// <summary>
+    /// Checks if the input numbers are co-prime (i.e. only common factor is 1)
+    /// </summary>
+    public static bool IsCoPrime(List<int> numbers)
+    {
+      List<int> concatFactors = new List<int>();
+      foreach (int number in numbers)
+      {
+        var factors = GetFactors(number);
+        factors.Remove(1);
+        concatFactors.AddRange(factors);
+      }
+
+      var duplicateFactors = concatFactors.GroupBy(x => x)
+              .Where(g => g.Count() > 1)
+              .Select(y => y.Key)
+              .ToList();
+
+      return duplicateFactors.Count == 0 ? true : false;
     }
 
     /// <summary>

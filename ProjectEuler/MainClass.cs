@@ -99,8 +99,9 @@ namespace ProjectEuler
       //PrintResult(37, calculator.Problem37());
 
       //Debug.WriteLine(calculator.Problem38());
-
-      //Debug.WriteLine(calculator.Problem39a());
+      
+      //Cleaned up + improved comments
+      PrintResult(41, calculator.Problem39());
 
       //Debug.WriteLine(calculator.Problem40());
 
@@ -113,7 +114,7 @@ namespace ProjectEuler
       //PrintResult(43, calculator.Problem43());
 
       //Cleaned up + improved comments
-      PrintResult(44, calculator.Problem44());
+      //PrintResult(44, calculator.Problem44());
 
       //MessageBox.Show(Calculator.Problem454().ToString());
 

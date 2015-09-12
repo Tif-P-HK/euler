@@ -221,7 +221,7 @@ namespace ProjectEuler
      
       for (int nGuess = 1; nGuess <= maxN; nGuess++)
       {
-        //skip if (500-n^2)/n (i.e. m) is not an integer
+        //skip if (500-n^2)%n !=0 (i.e. m) is not an integer
         if ((500 - nGuess * nGuess) % nGuess != 0)
           continue;
 
@@ -1179,162 +1179,30 @@ namespace ProjectEuler
       return "The last number is the answer";
     }
 
-    public int Problem39b()
-    {
-      int pMax = 1000;
-      Dictionary<int, int> numOfSlns = new Dictionary<int, int>();
-      SortedSet<int> abc;
-      SortedSet<int> abcOld = new SortedSet<int>();
-
-      for (int p = 12; p <= pMax; p++)
-      {
-        numOfSlns.Add(p, 0);
-        for (int a = 1; a < p; a++)
-        {
-          for (int b = 1; b < p; b++)
-          {
-            if (a + b >= p)
-              break;
-
-            int c = p - a - b;
-
-            Int32 aSq_Plus_bSq = (Int32)(Math.Pow(a, 2) + Math.Pow(b, 2));
-            Int32 aSq_Mins_bSq = Math.Abs((Int32)(Math.Pow(a, 2) - Math.Pow(b, 2)));
-
-            //not a Right angled triangle
-            if ((Int32)Math.Pow(c, 2) != aSq_Plus_bSq && (Int32)Math.Pow(c, 2) != aSq_Mins_bSq)
-              continue;
-
-            if (a + b + c == p)
-            {
-              abc = new SortedSet<int>(new int[] { a, b, c });
-              if (!abc.SetEquals(abcOld))
-                ++numOfSlns[p];
-              abcOld = abc;
-            }
-          }
-        }
-        if (numOfSlns[p] == 0 || numOfSlns[p] == 1)
-          numOfSlns.Remove(p);
-      }
-      return 0;
-    }
-
-    public int Problem39a()
-    {
-      int a, b, c;
-      int sum = 0;
-      int curNumOfSlns = 0;
-      int maxNumOfSlns = 0;
-
-      for(int m=3; m<22; m++)
-      {
-        for (int n = 3; n < 22; n++)
-        {
-          a = m * m - n * n;
-          b = 2 * m * n;
-          c = m * m + n * n;
-          sum = a + b + c;
-
-          if (a <= 0 || b <= 0)
-            break;
-
-          if (a + b + c > 1000)
-          {
-            if (curNumOfSlns > maxNumOfSlns)
-            {
-              maxNumOfSlns = curNumOfSlns;
-              Debug.WriteLine(string.Format("maxNumOfSlns {0}", maxNumOfSlns));
-            }
-            break;
-          }
-          else
-          {
-            Debug.WriteLine(string.Format("{0} + {1} + {2} = {3}", a, b, c, sum));
-            curNumOfSlns++;
-          }
-        }
-
-        curNumOfSlns = 0;
-      }
-
-      return 0;
-    }
-
     public int Problem39()
     {
-      Dictionary<int, int> sumCountPairs = new Dictionary<int, int>();
-      List<Tuple<int, int, int>> pythTriples = this.GetPythTriples();
-
-      int sum = 0;
-      bool is120 = false;
-      foreach (Tuple<int, int, int> pythTriple in pythTriples)
+      int maxValue = 1000;
+      int sumOfTriple = 0;
+      int maxNumberOfSolutions = 0;
+      Dictionary<int, int> triplesum_solutionCountPairs = new Dictionary<int, int>();
+      
+      List<Tuple<int, int, int>> triples = CalculatorUtil.GetPythagoreanTriples(maxValue);
+      foreach(Tuple<int, int, int> triple in triples)
       {
-        sum = pythTriple.Item1 + pythTriple.Item2 + pythTriple.Item3;
-        if (sum == 120) is120 = true;
-        if (sum > 1000)
-          continue;
-
-        if (!sumCountPairs.ContainsKey(sum))
-          sumCountPairs.Add(sum, 1);
+        sumOfTriple = triple.Item1 + triple.Item2 + triple.Item3;
+        if (!triplesum_solutionCountPairs.ContainsKey(sumOfTriple))
+          triplesum_solutionCountPairs.Add(sumOfTriple, 1);
         else
-          ++sumCountPairs[sum];
+          ++triplesum_solutionCountPairs[sumOfTriple];
       }
-      //Find the key from the sumCountPairs with the highest value
+
+      //Find the key from the triplesum_solutionCountPairs with the most number of solutions (i.e. item with the greatest values)
       //code adopted from http://stackoverflow.com/questions/2805703/good-way-to-get-the-key-of-the-highest-value-of-a-dictionary-in-c-sharp
-      int maxValueKey = sumCountPairs.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+      maxNumberOfSolutions = triplesum_solutionCountPairs.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
 
-      return maxValueKey;
+      return maxNumberOfSolutions;
     }
-
-    //All the pyth. triples whose sums are below 1000
-    private List<Tuple<int, int, int>> GetPythTriples()
-    {
-      //http://en.wikipedia.org/wiki/Formulas_for_generating_Pythagorean_triples
-      List<Tuple<int, int, int>> PythTriples = new List<Tuple<int, int, int>>();
-
-      int a = 0, b = 4, c = 0;
-      int m = 0, n = 0;
-
-      bool is120 = false;
-
-      while (b < 1000)
-      {
-        if (b == 48) is120 = true;
-        List<int> factors = CalculatorUtil.GetFactors(b / 2);  
-        List<Tuple<int, int>> factorsPairs = GetFactorsPairs(factors);
-
-        foreach (Tuple<int, int> factorsPair in factorsPairs)
-        {
-          m = factorsPair.Item1; n = factorsPair.Item2;
-          a = m * m - n * n;
-          c = m * m + n * n;
-
-          if (a + b + c == 120) is120 = true;
-
-          if (c > 1000)
-            continue;
-
-          if (a + b + c <= 1000)
-            PythTriples.Add(new Tuple<int, int, int>(a, b, c));
-        }
-
-        b += 2; 
-      }
-
-      return PythTriples;
-    }
-
-    private List<Tuple<int,int>> GetFactorsPairs(List<int> factors)
-    {
-      List<Tuple<int, int>> factorsPairs = new List<Tuple<int, int>>();
-      int lastIndex = factors.Count;
-      --lastIndex;
-      for (int i = 0; i <= (factors.Count / 2) - 1; i++)
-        factorsPairs.Add(new Tuple<int, int>(factors[lastIndex - i], factors[i]));
-      return factorsPairs;
-    }
-
+    
     public int Problem40()
     {
       StringBuilder sb = new StringBuilder('0');
