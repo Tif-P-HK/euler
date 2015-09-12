@@ -1,5 +1,5 @@
 ## A Journey Thru Project Euler
-This repo is a log book of my work on solving (or struggling to solve, or failed to solve) [Project Euler](https://projecteuler.net/)'s problems. 
+This repo is a log book of my work on successfully solving (or struggling to solve, or failed to solve) [Project Euler](https://projecteuler.net/)'s problems. 
 
 As a side project, I am also revisiting and cleaning up the code I wrote some years back, when my coding skill was a lot worse and the code was a lot more messy.
 
