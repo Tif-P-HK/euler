@@ -1152,6 +1152,15 @@ namespace ProjectEuler
         product *= num;
       return product;
     }
+    
+    /// <summary>
+    /// Covert a 0-9 digit to char
+    /// If input is not within 0 to 9, return null
+    /// </summary>
+    public static char IntToChar(int digit)
+    {
+      return (char)(digit + 48);
+    }
 
     /// <summary>
     /// Returns true if num is a square number
@@ -1198,16 +1207,31 @@ namespace ProjectEuler
     /// Check if the number is pandigital 
     /// (i.e. for a n-digit number is pandigital if it makes use of all the digits 1 to n exactly once)
     /// </summary>
-    public static bool IsPandigital(int number)
+    public static bool IsPandigital(long number)
     {
+      // Brute force way to check if the input is a pandigital number
+      // by converting the number into a string then check recurcively for repeated characters
+      // Pros: With this approach, input number can be Int32 or Int64
       string numberString = number + "";
       int stringLength = numberString.Length;
       if (stringLength == 1)
         return numberString == "1";
-      else 
+      else
         return numberString.Contains(stringLength + "") &&
-          HasRepeatedChar(numberString) == null && 
-          IsPandigital(Convert.ToInt32(numberString.Replace(stringLength + "", "")));        
+          HasRepeatedChar(numberString) == null &&
+          IsPandigital(Convert.ToInt32(numberString.Replace(stringLength + "", "")));
+
+      // Mathematical way. Algorithm adopted from: http://stackoverflow.com/questions/2484892/fastest-algorithm-to-check-if-a-number-is-pandigital
+      // This approach only works with Int32
+      //int digits = 0; int count = 0; int tmp;
+
+      //for (; number > 0; number /= 10, ++count)
+      //{
+      //  if ((tmp = digits) == (digits |= 1 << (number - ((number  / 10) * 10) - 1)))
+      //    return false;
+      //}
+
+      //return digits == (1 << count) - 1;
     }
 
     /// <summary>
@@ -1229,22 +1253,28 @@ namespace ProjectEuler
     /// <summary>
     /// Checks if a number is Pentagonal (see #44)
     /// </summary>
-    public static bool IsPentagonal(int number)
+    public static bool IsPentagonal(long number)
     {
-      //Use quadratic formula to try to find the N corresponding to the number
-      //(nGuess * (3 * nGuess - 1) / 2) = number
-      //nGuess * (3 * nGuess - 1) = number * 2
-      //3n^2 - nGuess - number * 2 = 0
-      number = number * 2;
+      ////Use quadratic formula to try to find the N corresponding to the number
+      ////(nGuess * (3 * nGuess - 1) / 2) = number
+      ////nGuess * (3 * nGuess - 1) = number * 2
+      ////3n^2 - nGuess - number * 2 = 0
+      //number = number * 2;
 
-      Int64 delta = 1 + 4 * 3 * number;
-      if (!CalculatorUtil.IsSquareNumber(delta))
-        return false;
+      //Int64 delta = 1 + 4 * 3 * number;
+      //if (!CalculatorUtil.IsSquareNumber(delta))
+      //  return false;
 
-      if ((1 + Math.Sqrt(delta)) % 6 == 0)
-        return true;
-      else
-        return false;
+      //if ((1 + Math.Sqrt(delta)) % 6 == 0)
+      //  return true;
+      //else
+      //  return false;
+
+      // Formula that determines if a number is pentagonal
+      // http://www.divye.in/2012/07/how-do-you-determine-if-number-n-is.html
+      double mod = (1 + Math.Sqrt(24 * number + 1)) % 6;
+
+      return  mod == 0 ? true : false;        
     }
 
     /// <summary>
@@ -1261,6 +1291,78 @@ namespace ProjectEuler
           return !isPrime;
 
       return isPrime;
+    }
+
+    /// <summary>
+    /// Use permutation to compute a list of pandigital numbers using the given first and last digits
+    /// 
+    /// firstDigit and lastDigit must be digits from 0 to 9. firstDigit must be less than or equal to lastDigit. 
+    /// Otherwise null will be returned
+    /// </summary>
+    public static List<string> GetPandigitalNumbers(int firstDigit, int lastDigit)
+    {
+      if ((firstDigit < 0 || firstDigit > 9) || (lastDigit < 0 || lastDigit > 9))
+        return null;
+      if (firstDigit > lastDigit)
+        return null;
+
+      List<char> cs = new List<char>();
+      int index = firstDigit;
+      while(index <= lastDigit)
+      {
+        cs.Add(IntToChar(index));
+        ++index;
+      }
+
+      List<List<char>> permutations = GetPermutations(cs);
+      List<string> pandigitalNumbers = new List<string>();
+      foreach (List<char> permutation in permutations)
+        pandigitalNumbers.Add(string.Concat(permutation));
+
+      return pandigitalNumbers;
+    }
+
+    public static List<List<char>> GetPermutations(List<char> items)
+    {
+      List<List<char>> permutations = new List<List<char>>(); 
+
+      List<char> copiedItems = items;
+
+      if (items.Count == 1)
+        permutations.Add(items);
+      else
+      {
+        for(int index = 0; index < items.Count; index++)
+        {
+          //char removedItem = items[index];
+          //copiedItems.Remove(removedItem);
+
+          //swap items[index] with items[0]
+          if (index >=1){
+            char item = copiedItems[index];
+            copiedItems.RemoveAt(index);
+            copiedItems.Insert(0, item);
+          }
+          List<char> copiedItemsSubSet = copiedItems.GetRange(1, (copiedItems.Count - 1));
+          List<List<char>> partialPermutations = GetPermutations(copiedItemsSubSet);
+          foreach(List<char> partialPermutation in partialPermutations)
+          {
+            //partialPermutation.Insert(0, removedItem);
+            permutations.Add(partialPermutation);
+          }
+        }
+      }
+
+      return permutations;
+    }
+
+    /// <summary>
+    /// Get the number of permutations based on the number of items
+    /// Number of permutations = Factorial(itemCount);
+    /// </summary>
+    private long GetPermutationCount(int itemCount)
+    {
+      return GetFactorial(itemCount);
     }
 
     /// <summary>

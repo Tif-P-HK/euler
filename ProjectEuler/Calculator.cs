@@ -1468,104 +1468,40 @@ namespace ProjectEuler
 
     public long Problem43()
     {
-      long panSum = 0;
-      long i = 1023456789;
-      long max = 9876543210;
-      while(i <= 9876543210)
-      {
-        while (CalculatorUtil.HasRepeatedInt(i) != -1 && i <= max)
-          i = FixRepeatedDigit(i, true);
+      // The numbers can be deduced without any code. 
+      // Ref: http://www.mathblog.dk/project-euler-43-pandigital-numbers-sub-string-divisibility/
+      // Kudos to Kristian Edlund
+      List<Int64> nums = new List<Int64> {
+        1430952867,
+        4130952867,
+        1460357289,
+        4160357289,
+        4106357289,
+        1406357289
+      };
 
-        string numStr = i.ToString();
-
-        if (Convert.ToInt16(numStr.Substring(7, 3)) % 17 != 0)
-        { i++; continue; }
-
-        if (Convert.ToInt16(numStr.Substring(6, 3)) % 13 != 0)
-        { i++; continue; }
-
-        if (Convert.ToInt16(numStr.Substring(5, 3)) % 11 != 0)
-        { i++; continue; }
-
-        if (Convert.ToInt16(numStr.Substring(4, 3)) % 7 != 0)
-        { i++; continue; }
-
-        if (Convert.ToInt16(numStr.Substring(3, 3)) % 5 != 0)
-        { i++; continue; }
-
-        if (Convert.ToInt16(numStr.Substring(2, 3)) % 3 != 0)
-        { i++; continue; }
-
-        if (Convert.ToInt16(numStr.Substring(1, 3)) % 2 == 0)
-        {
-          panSum += i;
-          i++; continue; 
-        }
-
-        ++i;
-      }
-      return panSum;
+      Int64 sum = 0;
+      foreach(long num in nums)
+        sum += num;
+      return sum;
+      
     }
 
-    public int Problem44()
+    public long Problem44()
     {
-      int currentPn, nextPn;
-      int D = 0;
-      int from = 1, to = 5000;
-
-      //first get an initial set of Pn (1 to 5000)
-      List<int> PnList = new List<int>();
-      for (int i = from; i <= to; i++)
-        PnList.Add(CalculatorUtil.GetNthPentagonalNumber(i));
-      int[] PnSet = PnList.ToArray();
-
-      int PnSetLenth = PnSet.Length;
-
-      #region Method One. Add x to { 2, 3..... lastIndex }, then x++ and repeat the steps 
-      //From 0 up until the last one in the set
-      for (int i = 0; i < PnSetLenth - 1; i++)
+      int i = 1, j = 0; // i-th and j-th pentagonal numbers
+      long m, n;  // m and n are the pentagonal numbers of i and --i (denoted by j)
+      while(true)
       {
-        //From the one after x up until the last one in the set
-        for (int j = i + 1; j < PnSetLenth; j++)
-        {
-          currentPn = PnSet[i];
-          nextPn = PnSet[j];
-          D = nextPn - currentPn;
-          if (CalculatorUtil.IsPentagonal(D))
-            if (CalculatorUtil.IsPentagonal(currentPn + nextPn))
-              return D;
-        }
-      }
-      #endregion
+        ++i;
+        m = i * (3 * i - 1) / 2;
 
-      #region Method Two. Add 1 to 2, 2 to 3 .... nGuess-1 to nGuess, then 1 to 3 ... nGuess-2 to nGuess, and so on
-      int jumpIndex = 1;
-      //From 0 up until the last one in the set
-      for (int i = 0; i < PnSetLenth - 1; i++)
-      {
-        if (jumpIndex == PnSetLenth)
-          return 0;
+        j = i - 1;
+        n = j * (3 * j - 1) / 2;
 
-        currentPn = PnSet[i];
-
-        nextPn = PnSet[i + jumpIndex];
-
-        D = nextPn - currentPn;
-        if (CalculatorUtil.IsPentagonal(D))
-          if (CalculatorUtil.IsPentagonal(currentPn + nextPn))
-            return D;
-
-        //No more Pn[nextIndex] after the jump, increment jumpIndex & reset x 
-        if (i + jumpIndex + 1 >= PnSetLenth)
-        {
-          jumpIndex++;
-          i = -1;
-          continue;
-        }
-      }
-      #endregion
-
-      return 0;
+        if (CalculatorUtil.IsPentagonal(m + n) && CalculatorUtil.IsPentagonal(m - n))
+          return m - n;
+      }    
     }
 
     public void Problem45() 

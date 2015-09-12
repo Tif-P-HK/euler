@@ -109,12 +109,14 @@ namespace ProjectEuler
 
       //Debug.WriteLine(calculator.Problem42());
 
-      //Debug.WriteLine(calculator.Problem43());
+      //Cleaned up + improved comments
+      //PrintResult(43, calculator.Problem43());
 
-      //MessageBox.Show(calculator.Problem44().ToString());
+      //Cleaned up + improved comments
+      PrintResult(44, calculator.Problem44());
 
       //MessageBox.Show(Calculator.Problem454().ToString());
-      
+
       //CalculatorUtil.SubString() -- make it a string extension method
 
       //PrintResult(999, CalculatorUtil.ReverseSubstringCharsFromStartTo0("string", 3));
